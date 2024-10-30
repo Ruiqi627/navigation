@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Custom IDW Interpolation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- 引入 Leaflet -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    // 初始化地图
+    var map = L.map('map').setView([37.7749, -122.4194], 13); // 设置为旧金山的经纬度和缩放级别
+
+    // 添加底图图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // 数据点（经纬度和值）
+    var dataPoints = [
+        {lat: 37.7749, lng: -122.4194, value: 10},
+        {lat: 37.7849, lng: -122.4294, value: 20},
+        {lat: 37.7649, lng: -122.4094, value: 30},
+        {lat: 37.7549, lng: -122.4394, value: 40},
+        {lat: 37.7449, lng: -122.4194, value: 50}
+    ];
+
+    // 自定义反距离权重插值算法
+    function calculateIDW(lat, lng, points, exp) {
+        var weightedSum = 0;
+        var weightSum = 0;
+
+        points.forEach(function(point) {
+            var dist = Math.sqrt(Math.pow(lat - point.lat, 2) + Math.pow(lng - point.lng, 2));
+            var weight = 1 / Math.pow(dist, exp);
+            weightedSum += point.value * weight;
+            weightSum += weight;
+        });
+
+        return weightedSum / weightSum;
+    }
+
+    // 渲染 IDW 插值图层
+    function renderIDWLayer() {
+        var bounds = map.getBounds();
+        var cellSize = 0.005; // 单元格大小，控制分辨率
+        var exp = 2;          // 距离权重指数
+        var latStart = bounds.getSouth();
+        var latEnd = bounds.getNorth();
+        var lngStart = bounds.getWest();
+        var lngEnd = bounds.getEast();
+
+        for (var lat = latStart; lat <= latEnd; lat += cellSize) {
+            for (var lng = lngStart; lng <= lngEnd; lng += cellSize) {
+                var value = calculateIDW(lat, lng, dataPoints, exp);
+
+                // 根据插值值选择颜色
+                var color = getColor(value);
+                L.rectangle([[lat, lng], [lat + cellSize, lng + cellSize]], {
+                    color: color,
+                    weight: 0,
+                    fillOpacity: 0.5
+                }).addTo(map);
+            }
+        }
+    }
+
+    // 根据值返回颜色（自定义的颜色映射）
+    function getColor(value) {
+        return value > 40 ? '#800026' :
+               value > 30 ? '#BD0026' :
+               value > 20 ? '#E31A1C' :
+               value > 10 ? '#FC4E2A' :
+                            '#FFEDA0';
+    }
+
+    // 加载IDW图层
+    renderIDWLayer();
+
+    // 显示数据点
+    dataPoints.forEach(function(point) {
+        L.circleMarker([point.lat, point.lng], {
+            radius: 5,
+            color: "red",
+            fillColor: "#f03",
+            fillOpacity: 0.5
+        }).addTo(map).bindPopup("Value: " + point.value);
+    });
+</script>
+
+</body>
+</html>

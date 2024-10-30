@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "topedgecopy",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "distance": 1.0 }, "geometry": { "type": "LineString", "coordinates": [ [ 103.849994018506095, 1.424404412081289 ], [ 103.850781317524493, 1.424400833449387 ], [ 103.850783554169453, 1.424367731104295 ], [ 103.851484966022184, 1.424371309736197 ] ] } },
+{ "type": "Feature", "properties": { "distance": 2.0 }, "geometry": { "type": "LineString", "coordinates": [ [ 103.850790264104248, 1.424368178433282 ], [ 103.850784896156398, 1.4231608374954 ] ] } },
+{ "type": "Feature", "properties": { "distance": 3.0 }, "geometry": { "type": "LineString", "coordinates": [ [ 103.850789593110733, 1.423982580845859 ], [ 103.851303126788636, 1.423989738109663 ], [ 103.851618046395998, 1.423986159477761 ] ] } }
+]
+}

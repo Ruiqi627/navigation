@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoJSON 转换器</title>
+</head>
+<body>
+    <h1>GeoJSON 转换器</h1>
+    <textarea id="input" rows="20" cols="80" placeholder="在此处粘贴您的 GeoJSON 数据"></textarea>
+    <br>
+    <button onclick="convertGeoJSON()">转换</button>
+    <h2>转换后的结果</h2>
+    <pre id="output"></pre>
+
+    <script>
+        function convertGeoJSON() {
+            const input = document.getElementById('input').value;
+            let geoData;
+
+            try {
+                geoData = JSON.parse(input);
+            } catch (e) {
+                document.getElementById('output').textContent = "无效的 GeoJSON 数据";
+                return;
+            }
+
+            const convertedFeatures = geoData.features.map(feature => {
+                return {
+                    type: "Feature",
+                    geometry: {
+                        type: "LineString",
+                        coordinates: feature.geometry.coordinates[0]
+                    },
+                    properties: {
+                        distance: feature.properties.distance
+                    }
+                };
+            });
+
+            const convertedGeoJSON = {
+                type: "FeatureCollection",
+                features: convertedFeatures
+            };
+
+            document.getElementById('output').textContent = JSON.stringify(convertedGeoJSON, null, 2);
+        }
+    </script>
+</body>
+</html>
